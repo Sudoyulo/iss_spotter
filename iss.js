@@ -47,7 +47,35 @@ const fetchCoordsByIP = (apikey, callback) => {
       else {
         const data = JSON.parse(resp.body);
         const coords = { latitude: data.latitude, longitude: data.longitude };
-        callback(null, coords); //data.ip is typeof string
+        return callback(null, coords); //data.ip is typeof string
+      }
+    }
+    return;
+  });
+};
+
+const fetchISSFlyOverTimes = function(coords, callback) {
+  // console.log(coords);
+
+  request("https://iss-pass.herokuapp.com/json/?lat=" + coords.latitude + "&lon=" + coords.longitude, (err, resp) => {
+
+    if (err) {
+      return callback(err, null);
+    }
+    
+    if (resp.statusCode !== 200) {
+      const msg = `Status Code ${resp.statusCode} when fetching fly by times. Response: ${resp}`;
+      callback(Error(msg), null);
+      return;
+    }
+
+    if (!err) {
+      if (resp.length === 0)
+        callback("Not found", null);
+      else {
+        const data = JSON.parse(resp.body);
+        // console.log(data)
+        callback(null, data); //data.ip is typeof string
       }
     }
     return;
@@ -55,4 +83,4 @@ const fetchCoordsByIP = (apikey, callback) => {
 };
 
 
-module.exports = { fetchMyIP, fetchCoordsByIP };
+module.exports = { fetchMyIP, fetchCoordsByIP, fetchISSFlyOverTimes };
